@@ -4,7 +4,6 @@ const commentModel = require('../models/comment-model')
 const mediaModel = require('../models/media-model')
 const { isLoggedIn } = require('../middlewares/isLoggedIn')
 
-// ─── 1. Render Comments Page ──────────────────────────────
 router.get('/:mediaId', isLoggedIn, async (req, res) => {
     try {
         const media = await mediaModel.findById(req.params.mediaId)
@@ -28,7 +27,6 @@ router.get('/:mediaId', isLoggedIn, async (req, res) => {
     }
 })
 
-// ─── 2. Create Comment + Notify Media Owner ───────────────
 router.post('/:mediaId', isLoggedIn, async (req, res) => {
     try {
         const { comment } = req.body
@@ -43,7 +41,6 @@ router.post('/:mediaId', isLoggedIn, async (req, res) => {
             userId: req.user._id
         })
 
-        // 🔑 FIX: Only notify the media owner, and skip if they commented on their own post
         const ownerId = media.uploadedBy ? media.uploadedBy.toString() : null;
         const commenterId = req.user._id.toString();
 
@@ -63,7 +60,6 @@ router.post('/:mediaId', isLoggedIn, async (req, res) => {
     }
 })
 
-// ─── 3. Delete Comment ────────────────────────────────────
 router.post('/delete/:commentId', isLoggedIn, async (req, res) => {
     try {
         const comment = await commentModel.findById(req.params.commentId)
@@ -96,7 +92,6 @@ router.post('/media/:id/like', isLoggedIn, async (req, res) => {
         } else {
             await mediaModel.findByIdAndUpdate(mediaId, { $addToSet: { likes: userId } });
 
-            // 🔑 FIX: Only notify the owner, skip self-likes
             const ownerId = media.uploadedBy ? media.uploadedBy.toString() : null;
             const likerId = userId.toString();
 

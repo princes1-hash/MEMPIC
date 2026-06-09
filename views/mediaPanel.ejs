@@ -67,7 +67,6 @@
         </div>
     </aside>
 
-    <!-- Main -->
     <main class="ml-64 flex-1 p-8">
 
         <div class="mb-8">
@@ -75,11 +74,9 @@
             <p class="text-sm text-gray-500 mt-1">Add photos and videos to existing events</p>
         </div>
 
-        <!-- Upload Form -->
         <div id="upload" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
             <form method="POST" action="/media/upload" enctype="multipart/form-data" id="uploadForm">
 
-                <!-- Event Selector -->
                 <div class="mb-6">
                     <label class="block text-xs font-semibold text-gray-600 mb-2">Select Event *</label>
        <select name="eventId" class="input-field" required id="eventSelect" onchange="loadEventInfo()">
@@ -139,7 +136,6 @@
                     <input type="text" name="caption" placeholder="Add a caption for this media batch..." class="input-field">
                 </div>
 
-                <!-- File Drop Zone -->
                 <div class="mb-6">
                     <label class="block text-xs font-semibold text-gray-600 mb-2">Upload Files *</label>
                     <div class="drag-zone" id="dropZone" onclick="document.getElementById('mediaInput').click()">
@@ -150,7 +146,6 @@
                     </div>
                 </div>
 
-                <!-- File Preview List -->
                 <div id="fileList" class="space-y-2 mb-6 hidden">
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-xs font-semibold text-gray-600" id="fileCount">0 files selected</p>
@@ -159,7 +154,6 @@
                     <div id="fileItems" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
                 </div>
 
-                <!-- Submit -->
                 <button type="submit" class="gradient-bg text-white font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition flex items-center gap-2 shadow-lg shadow-rose-100 disabled:opacity-50" id="submitBtn">
                     <i class="ri-upload-cloud-2-line"></i>
                     <span>Upload to Event</span>
@@ -167,7 +161,6 @@
             </form>
         </div>
 
-        <!-- My Recent Uploads -->
         <div id="my-uploads" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
             <h2 class="text-lg font-bold text-gray-900 mb-5">My Recent Uploads</h2>
             <% if (locals.myUploads && myUploads.length > 0) { %>

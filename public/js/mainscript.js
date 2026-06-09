@@ -202,7 +202,7 @@ function toggleMenu(id, event) {
 function selectOption(id, value, label) {
     document.getElementById(`menu-${id}`).querySelector('.label-text').innerText = label;
     document.getElementById(`menu-${id}`).setAttribute('data-open', 'false');
-    executeLocalCategorySort(id, value); // Runs your actual sorting algorithm natively
+    executeLocalCategorySort(id, value); 
 }
 
 document.addEventListener('click', () => {

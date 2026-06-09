@@ -128,32 +128,23 @@
             const activeBg = document.getElementById('active-bg');
 
             if (role === 'admin') {
-                // Slide background capsule toggle right back to start position
                 activeBg.style.transform = 'translateX(0)';
-                
-                // Swap targets, contexts, and button labels to Admin context
                 form.action = '/adminLogin';
                 title.textContent = 'Welcome Back, Admin';
                 emailInput.placeholder = 'admin@iitr.ac.in';
                 submitBtn.textContent = 'Login as Admin';
-
-                // Handle text component state switching smoothly
                 btnAdmin.className = "w-1/2 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-200 text-slate-900 relative z-10";
                 btnPhoto.className = "w-1/2 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-200 text-slate-400 hover:text-slate-700 relative z-10";
                 
                 btnAdmin.querySelector('i').className = 'ri-shield-user-fill mr-1 text-sm align-middle';
                 btnPhoto.querySelector('i').className = 'ri-camera-lens-line mr-1 text-sm align-middle';
             } else if (role === 'photographer') {
-                // Slide background capsule toggle over to the right panel side flawlessly
                 activeBg.style.transform = 'translateX(100%)';
-
-                // Swap targets, contexts, and button labels to Photographer context
                 form.action = '/photographerLogin';
                 title.textContent = 'Welcome Back, Photographer';
                 emailInput.placeholder = 'lens@iitr.ac.in';
                 submitBtn.textContent = 'Login as Photographer';
 
-                // Handle text component state switching smoothly
                 btnPhoto.className = "w-1/2 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-200 text-slate-900 relative z-10";
                 btnAdmin.className = "w-1/2 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-200 text-slate-400 hover:text-slate-700 relative z-10";
                 

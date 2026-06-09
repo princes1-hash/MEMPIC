@@ -58,10 +58,10 @@
         </div>
     </aside>
 
-    <!-- Main Content Workspace -->
+    
     <main class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full overflow-x-hidden">
         
-        <!-- Header Actions -->
+       
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-2xl font-black text-gray-900 tracking-tight">System Ecosystem Control</h1>
@@ -72,7 +72,7 @@
             </button>
         </div>
 
-        <!-- Metric Scoreboard Grid -->
+        
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
             <div class="stat-card bg-white p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
                 <div class="w-11 h-11 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 text-xl"><i class="ri-folder-image-line"></i></div>
@@ -104,7 +104,6 @@
             </div>
         </div>
 
-        <!-- Primary Event Management Framework Table -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="p-6 border-b border-gray-50 flex items-center justify-between">
                 <h3 class="text-sm font-bold text-gray-900">Staged Event Directories</h3>
@@ -159,7 +158,6 @@
                                         <a href="/events/view/<%= event._id %>" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-teal-500 hover:bg-teal-50 transition" title="View Gallery">
                                             <i class="ri-eye-line text-base"></i>
                                         </a>
-                                        <!-- HERE is the vital route mapping to the Edit page I provided prior -->
                                         <a href="/media" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition" title="Modify Context">
                                             <i class="ri-edit-line text-base"></i>
                                         </a>
@@ -184,12 +182,10 @@
         </div>
     </main>
 
-    <!-- Overlay Prompt Container (Quick Provision Block modal) -->
 
   <script>
   let addEvent = document.querySelector(".add-event");
 
-  // Changed onclick to "click"
   addEvent.addEventListener("click", () => {
      window.location.href = "/admin/create/event";
   });

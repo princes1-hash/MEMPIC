@@ -2,10 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Notification = require('../models/live-notifications');
 
-// 🔒 Import YOUR website's actual login check middleware
 const { isLoggedIn } = require('../middlewares/isLoggedIn');
 
-// 📥 GET: Fetch history logs for the sliding user interface drawer panel container
 router.get('/api/notifications', isLoggedIn, async (req, res) => {
     console.log("REQ USER:", req.user._id);
 
@@ -21,7 +19,6 @@ router.get('/api/notifications', isLoggedIn, async (req, res) => {
     });
 });
 
-// 🧼 POST: Mark notifications as read
 router.post('/api/notifications/mark-read', isLoggedIn, async (req, res) => {
     try {
         if (!req.user) return res.status(401).json({ success: false });
@@ -33,7 +30,6 @@ router.post('/api/notifications/mark-read', isLoggedIn, async (req, res) => {
     }
 });
 
-// 🗑️ DELETE: Clear all historical notifications
 router.delete('/api/notifications/clear', isLoggedIn, async (req, res) => {
     try {
         if (!req.user) return res.status(401).json({ success: false });
@@ -45,7 +41,6 @@ router.delete('/api/notifications/clear', isLoggedIn, async (req, res) => {
     }
 });
 
-// 🧪 DIAGNOSTIC ROUTE: Run this to instantly inspect what your JWT middleware extracts!
 router.get('/api/debug-me', isLoggedIn, (req, res) => {
     res.json({
         hasReqUser: !!req.user,
