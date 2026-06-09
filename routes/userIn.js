@@ -15,15 +15,7 @@ router.get('/register', (req, res) => {
 
 router.post('/register', async (req, res) => {
     try {
-        const existingPhotographer = await userModel.findOne({
-            role: "photographer",
-            club: req.body.club
-        });
         
-        if (existingPhotographer) {
-            req.flash('error', 'A photographer is already assigned to this club');
-            res.redirect('/users/register');
-        }
         let { Fullname, email, password, confirmPass, role, isClubMember, club } = req.body
 
         if (password !== confirmPass) {
