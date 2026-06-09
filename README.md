@@ -1,4 +1,7 @@
-# MemPic
+# MemPic 
+
+# Webiste Link:
+https://mempic.onrender.com
 
 MemPic is a web-based media management platform designed for college clubs and event organizers. It helps manage event galleries, media uploads, member-only content, and photographer workflows in one place.
 
