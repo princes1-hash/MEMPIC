@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMPIC</title>
+    <link rel="alternate icon" type="image/png" href="/imgs/Mempic svg.svg">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #f43f5e, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-bg {
+            background: linear-gradient(to right, #fb7185, #38bdf8);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<%- include('notifications') %>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden pt-20">
+   <%- include('flash') %>
+    <nav class="w-full bg-white/80 backdrop-blur-md fixed top-0 z-50 border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-8">
+              <a href="/" class="font-black text-slate-900 text-xl tracking-tight flex items-center gap-2">
+                MEMPIC <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            </a>                
+                <ul class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                    <li><a href="/main" class="text-rose-500 font-semibold border-b-2 border-rose-500 pb-5 transition">Gallery</a></li>
+                    
+                    <li class="relative group pb-5 pt-5 -my-5 flex items-center cursor-pointer">
+                        <span class="hover:text-rose-500 transition flex items-center gap-1">
+                            Our Clubs
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-rose-500 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </span>
+                        <div class="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-100 shadow-xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-left z-50">
+                            <ul class="py-2 flex flex-col max-h-64 overflow-y-auto">
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">COGNIZANCE</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">THOMSO</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">MARS</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">CIG</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">SDSLabs</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">UBA</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">SocBiz</a></li>
+                                <li><a href="#" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-500 font-medium">BlocSoc</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="flex items-center space-x-6 text-sm font-medium">
+                <div class="hidden md:flex space-x-5 text-slate-400">
+                <button onclick="toggleNotificationDrawer()" class="relative p-2 text-slate-400 hover:text-slate-950 transition-colors focus:outline-none group">
+        <i class="ri-notification-3-line text-xl"></i>
+        <span id="nav-unread-dot" class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-400 rounded-full hidden [animation-duration:2s] animate-pulse"></span>
+    </button>
+
+                </div>
+                <a href="/users/profile" class="text-slate-600 hover:text-slate-900 hidden md:block transition-colors">Account</a>
+                <a href="/users/logout" class=" text-black  hover:text-rose-500 transition-all duration-300 px-5 py-2.5 rounded-full hover:opacity-100 transition shadow-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Layout Split -->
+    <div class="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-5rem)] gap-8 relative">
+        
+        <!-- Dynamic Overlay Drawer Navigation System (Triggered by GSAP) -->
+        <div class="sideBar fixed top-0 -right-[320px] w-[300px] h-full bg-white/95 backdrop-blur-2xl border-r border-slate-100 shadow-2xl z-50 flex flex-col justify-between py-8 px-6">
+            <div>
+                <div class="cross flex justify-end">
+                    <button class="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-rose-50 hover:text-rose-500 transition-all">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="linkk flex flex-col mt-12 gap-2">
+                    <a class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:text-cyan-500 transition-colors duration-300" href="/main"><i class="ri-gallery-line"></i><span>Public Gallery</span></a>
+  <div class="relative inline-block z-30">
+    <button onclick="toggleMainDropdown(event)" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:text-cyan-500 transition-colors duration-300">
+        <i class="ri-sort-asc"></i>
+        <span>Sort by:</span>
+    </button>
+
+    <div id="mainDropdownMenu" class="absolute left-0 mt-1 w-64 bg-white border border-slate-100 rounded-2xl shadow-xl hidden opacity-0 transition-all duration-200 py-2">
+        <div>
+            <div onclick="toggleSubAccordion('clubAccordion', 'clubChevron', event)" class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-cyan-500 transition-colors cursor-pointer select-none">
+                <span class="flex items-center gap-2"><i class="ri-team-line"></i> Club</span>
+                <i id="clubChevron" class="ri-arrow-down-s-line text-slate-400 transition-transform duration-300"></i>
+            </div>
+            
+            <div id="clubAccordion" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-slate-50/60">
+                <div class="py-1 max-h-48 overflow-y-auto">
+                    <% if (locals.clubs && clubs.length > 0) { %>
+                        <% clubs.forEach(club => { %>
+                            <button onclick="executeMenuSort('club', '<%= club.toLowerCase() %>')" class="w-full text-left px-8 py-2 text-xs font-bold text-slate-600 hover:text-cyan-500 transition-colors uppercase truncate block">
+                                • <%= club %>
+                            </button>
+                        <% }) %>
+                    <% } else { %>
+                        <span class="block px-8 py-2 text-xs text-slate-400 italic">No clubs found</span>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                    <a class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:text-cyan-500 transition-colors duration-300" href="/members"><i class="ri-bubble-chart-line"></i><span>Club Gallery</span></a>
+                    <a class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:text-cyan-500 transition-colors duration-300" href="/adminLogin"><i class="ri-add-circle-line"></i><span>Add Event</span></a>
+                    <a class="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 hover:text-cyan-500 transition-colors duration-300" href=""><i class="ri-mail-send-line"></i><span>Contact Us</span></a>
+                </div>
+            </div>
+            <div class="text-xs text-slate-400 font-medium text-center">
+                &copy; 2026 MEMPIC
+            </div>
+        </div>
+
+        <main class="flex-1 py-8 overflow-y-auto">
+            
+            <!-- Context Header Section -->
+            <div class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs font-bold text-rose-500 uppercase tracking-widest bg-rose-50 px-3 py-1 rounded-full">MEMPIC Central Hub</span>
+                    <h1 class="text-4xl font-black text-slate-900 mt-2 tracking-tight">Our Core Space</h1>
+                </div>
+                <div class="flex items-center menu gap-3">
+                    <button class="bg-white border border-slate-200 hover:text-rose-500 transition-colors px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50 transition flex items-center gap-2">
+                    <i class="ri-menu-2-line font-bold text-lg  "></i>
+
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Repeatable Content: Club Hub Section Element Container -->
+            <div id="vaultFoldersContainer" class="space-y-4">
+    <% if (locals.clubGalleries && clubGalleries.length > 0) { %>
+        <% clubGalleries.forEach(function(clubBlock){ %>
+            <% const HTML_SAFE_ID = clubBlock.clubName.toLowerCase().replace(/\s+/g, '-') %>
+            
+            <section class="bg-white club-section border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm mb-12 relative overflow-hidden" 
+                     id="club-card-<%= HTML_SAFE_ID %>"
+                     data-club="<%= clubBlock.clubName.toLowerCase() %>">
+                     
+                <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-rose-100/30 to-transparent rounded-bl-full pointer-events-none"></div>
+                    
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-6 mb-6">
+                    <div class="max-w-2xl">
+                        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+                            <%= clubBlock.clubName %>
+                            <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span>
+                        </h2>
+                        <p class="text-slate-500 text-sm mt-2 leading-relaxed"><%= clubBlock.description %></p>
+                    </div>
+
+                    <div class="flex items-center gap-3 shrink-0 select-none">
+    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="ri-filter-3-line"></i> Category:</span>
+    
+    <div class="relative inline-block text-left group/menu custom-select-menu" id="menu-<%= HTML_SAFE_ID %>" data-open="false">
+        
+        <button onclick="toggleMenu('<%= HTML_SAFE_ID %>', event)" 
+                class="w-48 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 flex items-center justify-between group-data-[open=true]/menu:border-gray-200 group-data-[open=true]/menu:bg-white transition-all duration-200 shadow-sm">
+            <span class="label-text">Default View</span>
+            <i class="ri-arrow-down-s-line text-slate-400 text-sm transition-transform duration-200 group-data-[open=true]/menu:rotate-180"></i>
+        </button>
+
+        <div class="absolute right-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl hidden group-data-[open=true]/menu:block py-1.5 z-40">
+            <button onclick="selectOption('<%= HTML_SAFE_ID %>', 'default', 'Default View')" class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-50 hover:text-slate-700 transition-colors block">Default View</button>
+            
+            <% let localCategories = [...new Set(clubBlock.events.map(e => e.category || 'General'))]; %>
+            <% localCategories.forEach(category => { %>
+                <button onclick="selectOption('<%= HTML_SAFE_ID %>', '<%= category.toLowerCase() %>', 'Priority: <%= category %>')" 
+                        class="w-full text-left px-2 py-2 text-xs font-bold text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 transition-colors block capitalize">
+                    Priority: <%= category %>
+                </button>
+            <% }) %>
+        </div>
+    </div>
+</div>
+                </div>
+
+                <div class="club-events-wrapper mt-6 space-y-10" id="events-wrapper-<%= HTML_SAFE_ID %>">
+                    <% clubBlock.events.forEach(function(event){ %>
+                        
+                        <div class="pt-8 border-t border-slate-100/80 event-subsection transition-all duration-300" 
+                             data-category="<%= (event.category ? event.category.toLowerCase() : 'general') %>">
+                            
+                           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h3 class="text-lg font-bold text-slate-900 tracking-tight"><%= event.eventName %></h3>
+        <p class="text-xs text-slate-400 font-medium mt-1"><%= event.description || 'No description provided.' %></p>
+    </div>
+
+    <div class="relative inline-block text-left group/format custom-format-menu select-none self-start sm:self-center" id="format-<%= event._id %>" data-open="false">
+        
+        <button onclick="this.parentElement.setAttribute('data-open', this.parentElement.getAttribute('data-open') === 'true' ? 'false' : 'true')" 
+                class="w-40 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 flex items-center justify-between group-data-[open=true]/format:border-slate-400 group-data-[open=true]/format:bg-white transition-all duration-200 shadow-sm focus:outline-none">
+            <span class="format-label-text">All Media</span>
+            <i class="ri-arrow-down-s-line text-slate-400 text-sm transition-transform duration-200 group-data-[open=true]/format:rotate-180"></i>
+        </button>
+
+        <div class="absolute right-0 mt-2 w-40 bg-white/90 backdrop-blur-md border border-slate-100 rounded-xl shadow-xl hidden group-data-[open=true]/format:block py-1.5 z-30 transition-all duration-200">
+            
+            <button onclick="executeFormatFilter('<%= event._id %>', 'all', 'All Media', this)" 
+                    class="w-full text-left px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100/70 transition-colors block">
+                All Media
+            </button>
+            
+            <button onclick="executeFormatFilter('<%= event._id %>', 'image', 'Images Only', this)" 
+                    class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100/70 hover:text-slate-700 transition-colors block">
+                Images Only
+            </button>
+            
+            <button onclick="executeFormatFilter('<%= event._id %>', 'video', 'Videos Only', this)" 
+                    class="w-full text-left px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100/70 hover:text-slate-700 transition-colors block">
+                Videos Only
+            </button>
+            
+        </div>
+    </div>
+</div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <% if (event.media && event.media.length > 0) { %>
+                                    <% event.media.forEach(function(item) { %>
+                                        <div class="group bg-slate-50 border border-slate-100 rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-300">
+                                            <div onclick=" window.location.href='/comments/<%= item._id %>'" class="relative cursor-pointer rounded-xl overflow-hidden aspect-[4/3] bg-slate-200 shadow-inner">
+                                                <% if (item.type === 'video') { %>
+                                                    <div class="relative w-full h-full rounded-2xl overflow-hidden bg-slate-900 shadow-sm group/video aspect-[4/3]">
+    
+                                            <video class="w-full h-full object-cover" 
+                                               src="<%= item.url %>"
+                                               loop 
+                                               muted 
+                                               playsinline
+                                               preload="metadata"
+                                               onmouseover="this.play()"
+                                               onmouseout="this.pause(); this.currentTime = 0;">
+                                                   </video>
+
+    <div class="absolute inset-0 bg-slate-950/20 group-hover/video:bg-transparent group-hover/video:opacity-0 transition-all duration-300 pointer-events-none flex items-center justify-center">
+        
+        <div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 flex items-center justify-center shadow-2xl transform scale-100 opacity-90 group-hover/video:scale-90 transition-all duration-300 ease-out">
+            <svg class="w-5 h-5 ml-0.5 fill-current opacity-95" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"></path>
+            </svg>
+        </div>
+        
+    </div>
+                                                    </div>
+                                                <% } else { %>
+                                                    <img  loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<%= item.url %>" alt="Gallery Media item" loading="lazy">
+                                                <% } %>
+                                            </div>
+                                            <div class="flex items-center justify-between mt-3 px-1">
+                                                 <div class="flex items-center gap-3">
+                                                <button 
+                                                    onclick="toggleLike('<%= item._id %>', this, event)" 
+                                                    class="flex items-center text-slate-500 gap-1.5 hover:text-rose-500 transition-colors text-xs group/like"
+                                                    data-liked="<%= locals.user && item.likes && item.likes.includes(user._id) ? 'true' : 'false' %>"
+                                                >
+                                                    <i class="<%= locals.user && item.likes && item.likes.includes(user._id) ? 'ri-heart-3-fill text-rose-500' : 'ri-heart-3-line group-hover/like:scale-110 transition-transform' %> text-lg"></i>
+                                                    <span class="like-count"><%= (item.likes ? item.likes.length : 0) %></span>
+                                                </button>
+                                            </div>
+                                                <div class="flex items-center space-x-3 text-slate-400">
+                                                    <button onclick="window.location.href='/comments/<%= item._id %>'" class="hover:text-slate-700 transition-colors"><i class="ri-chat-1-line text-lg"></i></button>
+                                                    <a href="<%= item.url %>" download class="hover:text-rose-500 transition-colors"><i class="ri-download-cloud-2-line text-lg"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <div class="col-span-full py-4 text-center">
+                                        <p class="text-sm text-slate-400 italic">No public media uploaded for this event yet.</p>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+
+                    <% }) %>
+                </div>
+            </section>
+        <% }) %>
+    <% } %>
+</div>
+           
+        </main>
+    </div>
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/mainscript.js" ></script>
+    <script>
+        
+// document.addEventListener('visibilitychange', () => {
+//     if (document.visibilityState === 'visible') {
+//         window.location.reload(); 
+//     }
+// });
+
+const socket = io();
+
+let loggedInSessionUserId = "";
+try {
+    <% if (locals.user) { %>
+        loggedInSessionUserId = "<%= user._id || user.id || '' %>";
+    <% } %>
+} catch(e) {
+    console.error("EJS parsing error checking active session variables", e);
+}
+
+if (loggedInSessionUserId) {
+    socket.emit('register-user-session', loggedInSessionUserId);
+}
+
+socket.on('incoming-notification', (notif) => {
+
+    const unreadDot = document.getElementById('nav-unread-dot');
+    if (unreadDot) {
+        unreadDot.classList.remove('hidden');
+    }
+
+    const drawer = document.getElementById('notification-drawer');
+    const isDrawerOpen = drawer && !drawer.classList.contains('translate-x-full');
+
+    if (isDrawerOpen) {
+        renderCardElementInFeedView(notif, true);
+    } else {
+        const countBadge = document.getElementById('notification-badge-count');
+        if (countBadge) {
+            countBadge.innerText = parseInt(countBadge.innerText || 0) + 1;
+        }
+
+        createFloatingToastAlert(notif);
+    }
+});
+
+function createFloatingToastAlert(notif) {
+    const toast = document.createElement('div');
+    
+    toast.className = "fixed bottom-5 right-5 z-50 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl p-4 flex items-start gap-3 max-w-sm transition-all duration-500 transform translate-y-10 opacity-0 shadow-2xl";
+    toast.style.boxShadow = "0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08)";
+    
+    let iconClass = "ri-chat-3-line text-slate-500";
+    if (notif.type === 'like') iconClass = "ri-heart-3-line text-rose-500";
+    if (notif.type === 'system') iconClass = "ri-sparkling-line text-amber-500";
+
+    toast.innerHTML = `
+        <div class="w-8 h-8 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 shadow-xs">
+            <i class="${iconClass} text-sm"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <h4 class="text-xs font-bold text-slate-800 truncate">${notif.title || 'System Update'}</h4>
+            <p class="text-[11px] text-slate-500 font-medium mt-0.5 leading-relaxed break-words">${notif.message}</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 transition-colors shrink-0 pl-1">
+            <i class="ri-close-line text-base"></i>
+        </button>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.remove('translate-y-10', 'opacity-0');
+    }, 50);
+
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 500);
+    }, 5500);
+}
+
+async function toggleNotificationDrawer() {
+    const drawer = document.getElementById('notification-drawer');
+    const overlay = document.getElementById('drawer-overlay');
+    const isHidden = drawer.classList.contains('translate-x-full');
+
+    if (isHidden) {
+        await syncNotificationDataHistory();
+        drawer.classList.remove('translate-x-full');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('opacity-100'), 10);
+        }
+        const unreadDot = document.getElementById('nav-unread-dot');
+        if (unreadDot) unreadDot.classList.add('hidden');
+    } else {
+        drawer.classList.add('translate-x-full');
+        if (overlay) {
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+        
+        fetch('/api/notifications/mark-read', { method: 'POST' });
+    }
+    
+}
+
+async function syncNotificationDataHistory() {
+    try {
+        const res = await fetch('/api/notifications');
+        const data = await res.json();
+        
+        const feed = document.getElementById('notification-feed-container');
+        if (!feed) return;
+        
+        feed.innerHTML = '';
+        
+        if (data.success && data.notifications && data.notifications.length > 0) {
+            let unreadCount = 0;
+            data.notifications.forEach(notif => {
+                if(!notif.isRead) unreadCount++;
+                renderCardElementInFeedView(notif, false);
+            });
+            const countBadge = document.getElementById('notification-badge-count');
+            if (countBadge) countBadge.innerText = unreadCount;
+        } else {
+            feed.innerHTML = `
+                <div id="notification-empty-state" class="h-full flex flex-col items-center justify-center text-center p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 mb-3">
+                        <i class="ri-notification-off-line text-xl"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-700">All caught up!</p>
+                </div>`;
+            const countBadge = document.getElementById('notification-badge-count');
+            if (countBadge) countBadge.innerText = 0;
+        }
+    } catch (err) {
+        console.error("Critical issue fetching system alert arrays:", err);
+    }
+}
+
+function renderCardElementInFeedView(notif, isPrependAction = false) {
+    const feed = document.getElementById('notification-feed-container');
+    if (!feed) return;
+
+    const emptyState = document.getElementById('notification-empty-state');
+    if (emptyState) emptyState.remove();
+
+    const card = document.createElement('div');
+    card.className = `w-full p-3 rounded-xl flex gap-3 items-start transition-all duration-200 ${notif.isRead ? 'bg-white border border-slate-100/60' : 'bg-slate-50 border border-slate-100 shadow-xs animate-fadeInItem'}`;
+    
+    let iconClass = "ri-chat-3-line";
+    if (notif.type === 'like') iconClass = "ri-heart-3-line text-rose-400";
+    if (notif.type === 'system') iconClass = "ri-sparkling-line text-amber-500";
+
+    card.innerHTML = `
+        <div class="w-7 h-7 rounded-lg bg-white border border-slate-200/60 flex items-center justify-center shrink-0 shadow-xs">
+            <i class="${iconClass} text-xs"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <h4 class="text-xs font-bold text-slate-800 truncate">${notif.title || 'Notification'}</h4>
+            <p class="text-[11px] text-slate-500 font-medium mt-0.5 leading-relaxed break-words">${notif.message}</p>
+        </div>
+    `;
+
+    if (isPrependAction) {
+        feed.insertBefore(card, feed.firstChild);
+    } else {
+        feed.appendChild(card);
+    }
+}
+
+async function clearAllNotifications() {
+    try {
+        const res = await fetch('/api/notifications/clear', { method: 'DELETE' });
+        const data = await res.json();
+        if(data.success) {
+            await syncNotificationDataHistory();
+        }
+    } catch (err) {
+        console.error("Error clearing notifications:", err);
+    }
+}
+
+
+    </script>
+
+</body>
+</html>

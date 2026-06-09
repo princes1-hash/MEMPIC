@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMPIC</title>
+    <link rel="alternate icon" type="image/png" href="/imgs/Mempic svg.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .gradient-bg { background: linear-gradient(90deg, #f43f5e, #2dd4bf); }
+        .gradient-text { background: linear-gradient(90deg, #f43f5e, #2dd4bf); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); }
+        .input-field {
+            width: 100%; padding: 10px 14px; background: #f9fafb;
+            border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px;
+            outline: none; transition: all .2s;
+        }
+        .input-field:focus { border-color: #f43f5e; background: white; box-shadow: 0 0 0 3px rgba(244,63,94,0.08); }
+        .stat-card { transition: all .2s ease; }
+        .stat-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row">
+   <%- include('flash') %>
+   
+    <aside class="w-full lg:w-64 bg-white border-r border-gray-100 flex flex-col p-6 shrink-0">
+        <a href="/" class="font-black text-slate-900 ml-4 mt-4 text-xl tracking-tight flex items-center gap-2">
+                MEMPIC <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            </a>
+
+        <nav class="space-y-1.5 flex-1 mt-6">
+            <a href="/admin" class="flex items-center gap-3 px-4 py-3 bg-rose-50/60 rounded-xl text-sm font-bold text-rose-500 transition">
+                <i class="ri-dashboard-horizontal-line text-lg"></i> Overview
+            </a>
+            <a href="/main" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 rounded-xl text-sm font-semibold hover:text-gray-900 transition">
+                <i class="ri-bubble-chart-line text-lg"></i> Public Portal
+            </a>
+            <a href="#photographers" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 rounded-xl text-sm font-semibold hover:text-gray-900 transition">
+                <i class="ri-camera-switch-line text-lg"></i> Crew Access
+            </a>
+            <a href="#settings" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 rounded-xl text-sm font-semibold hover:text-gray-900 transition">
+                <i class="ri-settings-4-line text-lg"></i> Integration Settings
+            </a>
+        </nav>
+
+        <div class="pt-6 border-t border-gray-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-rose-400 to-teal-400 p-[2px]">
+                <div class="w-full h-full bg-white rounded-full flex items-center justify-center text-xs font-bold text-gray-700">AD</div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-gray-900 truncate"><%= user.Fullname %></p>
+                <p class="text-[10px] text-gray-400 truncate"><%= user.email %></p>
+            </div>
+            <a href="/logout" class="text-gray-400 hover:text-rose-500 transition"><i class="ri-logout-box-r-line"></i></a>
+        </div>
+    </aside>
+
+    <!-- Main Content Workspace -->
+    <main class="flex-1 p-6 lg:p-10 max-w-7xl mx-auto w-full overflow-x-hidden">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-2xl font-black text-gray-900 tracking-tight">System Ecosystem Control</h1>
+                <p class="text-xs text-gray-500 mt-0.5">Deploy structural galleries, manage credential permissions, and audit file processing pools.</p>
+            </div>
+            <button class="add-event gradient-bg text-white text-xs font-bold px-5 py-3 rounded-xl hover:opacity-90 transition shadow-md shadow-rose-100 flex items-center gap-1.5 self-start sm:self-auto">
+                <i class="ri-add-line text-sm "></i> Provisions New Event
+            </button>
+        </div>
+
+        <!-- Metric Scoreboard Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+            <div class="stat-card bg-white p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
+                <div class="w-11 h-11 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 text-xl"><i class="ri-folder-image-line"></i></div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Events</p>
+                    <p class="text-xl font-extrabold text-gray-900"><%= locals.events ? events.length : 0 %></p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
+                <div class="w-11 h-11 bg-teal-50 rounded-xl flex items-center justify-center text-teal-500 text-xl"><i class="ri-camera-lens-line"></i></div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Active Crew</p>
+                    <p class="text-xl font-extrabold text-gray-900">14</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
+                <div class="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500 text-xl"><i class="ri-hard-drive-2-line"></i></div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Storage Pool</p>
+                    <p class="text-xl font-extrabold text-gray-900">42.8 GB</p>
+                </div>
+            </div>
+            <div class="stat-card bg-white p-5 rounded-2xl border border-gray-100 flex items-center gap-4">
+                <div class="w-11 h-11 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 text-xl"><i class="ri-eye-line"></i></div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Public Hits</p>
+                    <p class="text-xl font-extrabold text-gray-900">1.2k</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Primary Event Management Framework Table -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-gray-900">Staged Event Directories</h3>
+                <span class="text-[11px] bg-gray-100 text-gray-500 font-bold px-2.5 py-1 rounded-full uppercase">Live Sync Active</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/70 border-b border-gray-100 text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                            <th class="py-3 px-6">Event Context</th>
+                            <th class="py-3 px-6">Club / Node</th>
+                            <th class="py-3 px-6">Timestamp / Venue</th>
+                            <th class="py-3 px-6">Visibility</th>
+                            <th class="py-3 px-6 text-right">Actions Matrix</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 text-sm">
+                        <% if (locals.events && events.length > 0) { %>
+                            <% events.forEach(event => { %>
+                                <tr class="hover:bg-gray-50/40 transition">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
+                                                <% if (event.coverImage) { %>
+                                                    <img src="<%= event.coverImage %>" class="w-full h-full object-cover">
+                                                <% } else { %>
+                                                    <div class="w-full h-full gradient-bg opacity-20 flex items-center justify-center"><i class="ri-image-line text-gray-400"></i></div>
+                                                <% } %>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold text-gray-900 line-clamp-1"><%= event.eventName %></p>
+                                                <p class="text-[11px] text-gray-400 uppercase mt-0.5"><%= event.category %></p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-gray-700 text-xs">
+                                        <span class="px-2 py-0.5 rounded bg-gray-100 border border-gray-200/50"><%= event.club %></span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <p class="text-xs font-medium text-gray-600"><%= new Date(event.eventDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+                                        <p class="text-[11px] text-gray-400 truncate max-w-[150px]"><%= event.venue || 'No Venue Specified' %></p>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <% if(event.visibility === 'public') { %>
+                                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full"><i class="ri-global-line"></i> Public</span>
+                                        <% } else { %>
+                                            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><i class="ri-lock-line"></i> Limited</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
+                                        <a href="/events/view/<%= event._id %>" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-teal-500 hover:bg-teal-50 transition" title="View Gallery">
+                                            <i class="ri-eye-line text-base"></i>
+                                        </a>
+                                        <!-- HERE is the vital route mapping to the Edit page I provided prior -->
+                                        <a href="/media" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition" title="Modify Context">
+                                            <i class="ri-edit-line text-base"></i>
+                                        </a>
+                                        <form method="POST" action="/admin/event/delete/<%= event._id %>?_method=DELETE" class="inline-block" onsubmit="return confirm('Confirm permanent deletion of this tracking branch?')">
+                                            <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
+                                                <i class="ri-delete-bin-line text-base"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="text-center py-12 text-gray-400 font-medium text-xs">
+                                    No operational manifests indexed. Select "Provisions New Event" to start staging pipelines.
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Overlay Prompt Container (Quick Provision Block modal) -->
+
+  <script>
+  let addEvent = document.querySelector(".add-event");
+
+  // Changed onclick to "click"
+  addEvent.addEventListener("click", () => {
+     window.location.href = "/admin/create/event";
+  });
+</script>
+  
+
+</body>
+</html>

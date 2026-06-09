@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMPIC</title>
+    <link rel="alternate icon" type="image/png" href="/imgs/Mempic svg.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .gradient-bg { background: linear-gradient(90deg, #f43f5e, #2dd4bf); }
+        .input-field {
+            width: 100%; padding: 10px 14px; background: #f9fafb;
+            border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px;
+            outline: none; transition: all .2s;
+        }
+        .input-field:focus { border-color: #f43f5e; background: white; box-shadow: 0 0 0 3px rgba(244,63,94,0.08); }
+        .drag-zone {
+            border: 2px dashed #e5e7eb; border-radius: 16px;
+            padding: 40px 24px; text-align: center; cursor: pointer; transition: all .2s;
+        }
+        .drag-zone:hover, .drag-zone.dragover { border-color: #f43f5e; background: #fff1f2; }
+        .file-item { animation: slideIn .2s ease; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex">
+   <%- include('flash') %>
+    
+    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full z-30 shadow-sm">
+        <div class="p-6 border-b border-gray-100">
+             <a href="/" class="font-black text-slate-900 text-xl tracking-tight ml-2 flex items-center gap-2">
+                MEMPIC <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            </a> 
+            <div class="mt-3 px-3 py-1.5 bg-teal-50 rounded-lg">
+                <span class="text-xs font-bold text-teal-500 uppercase tracking-wider">Media Panel</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="#upload" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-rose-500 bg-rose-50">
+                <i class="ri-upload-cloud-line text-lg"></i> Upload Media
+            </a>
+            <a href="#my-uploads" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                <i class="ri-gallery-line text-lg"></i> My Uploads
+            </a>
+            <a href="/profile" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                <i class="ri-user-3-line text-lg"></i> My Profile
+            </a>
+            <a href="/main" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
+                <i class="ri-home-line text-lg"></i> Gallery
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center gap-3 px-3 py-3 bg-gray-50 rounded-xl">
+                <div class="w-9 h-9 rounded-full gradient-bg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    <%= locals.user ? user.Fullname.charAt(0) : 'P' %>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-800"><%= locals.user ? user.Fullname : 'Photographer' %></p>
+                    <p class="text-xs text-gray-500">Admin</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="ml-64 flex-1 p-8">
+
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900">Upload Media</h1>
+            <p class="text-sm text-gray-500 mt-1">Add photos and videos to existing events</p>
+        </div>
+
+        <!-- Upload Form -->
+        <div id="upload" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
+            <form method="POST" action="/media/upload" enctype="multipart/form-data" id="uploadForm">
+
+                <!-- Event Selector -->
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-gray-600 mb-2">Select Event *</label>
+       <select name="eventId" class="input-field" required id="eventSelect" onchange="loadEventInfo()">
+    <option value="">-- Choose an Event --</option>
+    
+    <% if (locals.events) { %>
+        <% if (events.length > 0) { %>
+            <% events.forEach(event => { %>
+                <option value="<%= event._id %>" data-club="<%= event.club %>" data-date="<%= new Date(event.eventDate).toLocaleDateString() %>">
+                    <%= event.eventName %> (<%= event.club %>)
+                </option>
+            <% }) %>
+        <% } else { %>
+            <option value="" disabled>No events found in the system</option>
+        <% } %>
+    <% } %>
+</select>
+                </div>
+
+               
+                <div id="eventInfoCard" class="hidden mb-6 p-4 bg-gradient-to-r from-rose-50 to-teal-50 border border-rose-100 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
+                            <i class="ri-calendar-event-line text-white"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800 text-sm" id="infoEventName">—</p>
+                            <p class="text-xs text-gray-500" id="infoEventDetails">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-gray-600 mb-2">Media Visibility *</label>
+                    <p class="text-xs text-gray-400 mb-3">Choose who can see this uploaded media</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-start gap-3 cursor-pointer p-4 bg-gray-50 border border-gray-200 rounded-2xl hover:border-teal-300 transition has-[:checked]:border-teal-400 has-[:checked]:bg-teal-50">
+                            <input type="radio" name="visibility" value="public" class="accent-teal-500 mt-0.5" checked>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Public</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Visible to everyone who visits the gallery</p>
+                            </div>
+                        </label>
+                        <label class="flex items-start gap-3 cursor-pointer p-4 bg-gray-50 border border-gray-200 rounded-2xl hover:border-rose-300 transition has-[:checked]:border-rose-400 has-[:checked]:bg-rose-50">
+                            <input type="radio" name="visibility" value="members" class="accent-rose-500 mt-0.5">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">Members Only</p>
+                                <p class="text-xs text-gray-500 mt-0.5">Only accessible to club members</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-gray-600 mb-2">Caption (optional)</label>
+                    <input type="text" name="caption" placeholder="Add a caption for this media batch..." class="input-field">
+                </div>
+
+                <!-- File Drop Zone -->
+                <div class="mb-6">
+                    <label class="block text-xs font-semibold text-gray-600 mb-2">Upload Files *</label>
+                    <div class="drag-zone" id="dropZone" onclick="document.getElementById('mediaInput').click()">
+                        <input type="file" id="mediaInput" name="media" accept="image/*,video/*" multiple class="hidden" onchange="handleFiles(event)">
+                        <i class="ri-cloud-upload-line text-4xl text-gray-300 block mb-3"></i>
+                        <p class="text-gray-600 font-semibold text-sm">Drop files here or click to browse</p>
+                        <p class="text-xs text-gray-400 mt-1">Images (JPG, PNG, WEBP) and Videos (MP4, MOV) supported</p>
+                    </div>
+                </div>
+
+                <!-- File Preview List -->
+                <div id="fileList" class="space-y-2 mb-6 hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-xs font-semibold text-gray-600" id="fileCount">0 files selected</p>
+                        <button type="button" onclick="clearFiles()" class="text-xs text-rose-500 hover:underline">Clear all</button>
+                    </div>
+                    <div id="fileItems" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="gradient-bg text-white font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition flex items-center gap-2 shadow-lg shadow-rose-100 disabled:opacity-50" id="submitBtn">
+                    <i class="ri-upload-cloud-2-line"></i>
+                    <span>Upload to Event</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- My Recent Uploads -->
+        <div id="my-uploads" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <h2 class="text-lg font-bold text-gray-900 mb-5">My Recent Uploads</h2>
+            <% if (locals.myUploads && myUploads.length > 0) { %>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                <% myUploads.forEach(media => { %>
+                    <div class="group relative rounded-2xl overflow-hidden bg-gray-100 aspect-square">
+                        <% if (media.type === 'video') { %>
+                            <video class="w-full h-full object-cover" src="<%= media.url %>"></video>
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                <i class="ri-play-circle-line text-white text-3xl"></i>
+                            </div>
+                        <% } else { %>
+                            <img src="<%= media.url %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <% } %>
+                        <div class="absolute top-2 right-2">
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full <%= media.visibility === 'public' ? 'bg-teal-500' : 'bg-rose-500' %> text-white">
+                                <%= media.visibility === 'public' ? 'PUB' : 'MEM' %>
+                            </span>
+                        </div>
+                    </div>
+                <% }) %>
+                </div>
+            <% } else { %>
+                <div class="text-center py-12">
+                    <i class="ri-image-line text-4xl text-gray-200 block mb-3"></i>
+                    <p class="text-gray-500 text-sm">You haven't uploaded any media yet</p>
+                </div>
+            <% } %>
+        </div>
+
+    </main>
+
+    <script>
+        function loadEventInfo() {
+            const sel = document.getElementById('eventSelect');
+            const opt = sel.options[sel.selectedIndex];
+            const card = document.getElementById('eventInfoCard');
+            if (opt.value) {
+                card.classList.remove('hidden');
+                document.getElementById('infoEventName').textContent = opt.text;
+                document.getElementById('infoEventDetails').textContent = `${opt.dataset.club || ''} · ${opt.dataset.date || ''}`;
+            } else {
+                card.classList.add('hidden');
+            }
+        }
+
+        function handleFiles(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+            const list = document.getElementById('fileList');
+            const items = document.getElementById('fileItems');
+            const count = document.getElementById('fileCount');
+            list.classList.remove('hidden');
+            count.textContent = `${files.length} file${files.length > 1 ? 's' : ''} selected`;
+            items.innerHTML = '';
+            files.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'file-item relative rounded-xl overflow-hidden bg-gray-100 aspect-square';
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = e => { div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`; };
+                    reader.readAsDataURL(file);
+                } else {
+                    div.innerHTML = `<div class="w-full h-full bg-gray-900 flex flex-col items-center justify-center gap-1">
+                        <i class="ri-video-line text-white text-xl"></i>
+                        <p class="text-[10px] text-gray-400 px-2 text-center truncate w-full">${file.name}</p>
+                    </div>`;
+                }
+                items.appendChild(div);
+            });
+        }
+
+        function clearFiles() {
+            document.getElementById('mediaInput').value = '';
+            document.getElementById('fileList').classList.add('hidden');
+            document.getElementById('fileItems').innerHTML = '';
+        }
+
+        const dz = document.getElementById('dropZone');
+        dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('drop', e => {
+            e.preventDefault(); dz.classList.remove('dragover');
+            const input = document.getElementById('mediaInput');
+            const dt = new DataTransfer();
+            Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+            input.files = dt.files;
+            input.dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<% if(success_msg.length > 0){ %>
+<div class="flash-message fixed top-5 right-5 bg-green-500 text-white px-5 py-3 rounded-xl shadow-lg z-[9999]">
+    <%= success_msg[0] %>
+</div>
+<% } %>
+
+<% if(error_msg.length > 0){ %>
+<div class="flash-message fixed top-5 right-5 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg z-[9999]">
+    <%= error_msg[0] %>
+</div>
+<% } %>
+
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.flash-message').forEach(msg => {
+        msg.style.opacity = '0';
+        msg.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            msg.remove();
+        }, 300);
+    });
+}, 3000);
+</script>

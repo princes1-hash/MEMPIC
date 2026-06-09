@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMPIC</title>
+    <link rel="alternate icon" type="image/png" href="/imgs/Mempic svg.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .gradient-bg { background: linear-gradient(90deg, #f43f5e, #2dd4bf); }
+        .comment-item { animation: fadeUp .3s ease; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .textarea-field {
+            width: 100%; padding: 12px 16px; background: white; border: 1.5px solid #e5e7eb;
+            border-radius: 14px; font-size: 14px; outline: none; transition: all .2s; resize: none;
+        }
+        .textarea-field:focus { border-color: #f43f5e; box-shadow: 0 0 0 3px rgba(244,63,94,0.08); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+       <%- include('flash') %>
+    <nav class="w-full bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+             <a href="/" class="font-black text-slate-900 ml-4 text-xl tracking-tight flex items-center gap-2">
+                MEMPIC <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            </a> 
+            <div class="flex items-center gap-3">
+                <a href="javascript:history.back()" class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1 transition">
+                    <i class="ri-arrow-left-line"></i> Back
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto px-6 py-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Media Preview Panel -->
+            <div class="lg:sticky lg:top-24 self-start">
+                <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+                    <!-- Media display -->
+                    <% if (locals.media) { %>
+                        <% if (media.type === 'video') { %>
+                            <div class="aspect-video bg-black">
+                                <video src="<%= media.url %>" class="w-full h-full" controls></video>
+                            </div>
+                        <% } else { %>
+                            <div class="aspect-square bg-gray-100">
+                                <img src="<%= media.url %>" class="w-full h-full object-cover">
+                            </div>
+                        <% } %>
+                        <div class="p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full gradient-bg flex items-center justify-center text-white text-xs font-bold">
+                                        <%= media.uploadedBy ? media.uploadedBy.Fullname.charAt(0) : 'U' %>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800"><%= media.uploadedBy ? media.uploadedBy.Fullname : 'Unknown' %></p>
+                                        <p class="text-xs text-gray-400"><%= media.createdAt ? new Date(media.createdAt).toLocaleDateString('en-IN', {year:'numeric',month:'short',day:'numeric'}) : '' %></p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full <%= media.visibility === 'public' ? 'bg-teal-50 text-teal-600' : 'bg-rose-50 text-rose-500' %>">
+                                    <%= media.visibility === 'public' ? ' Public' : ' Members' %>
+                                </span>
+                            </div>
+                            <% if (media.caption) { %>
+                                <p class="text-sm text-gray-600 mt-2"><%= media.caption %></p>
+                            <% } %>
+                            <% if (media.eventId) { %>
+                                <div class="mt-3 flex items-center gap-2 text-xs text-gray-400">
+                                    <i class="ri-calendar-line"></i>
+                                    <span><%= media.eventId.eventName || 'Event' %></span>
+                                </div>
+                            <% } %>
+                            <!-- Like / share actions -->
+                            <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                                 <div class="flex items-center space-x-1.5 text-slate-600 hover:text-rose-500 transition-colors cursor-pointer">
+                                                <button onclick="toggleLike('<%= media._id %>', this, event)" 
+                                                   class="flex items-center gap-1.5 hover:text-rose-500 transition-colors text-xs  group/like" 
+                                                   data-liked="<%= (locals.user && media.likes && media.likes.map(id => id.toString()).includes(user._id.toString())) ? 'true' : 'false' %>"
+                                                   >
+                                                <i class="<%= (locals.user && media.likes && media.likes.map(id => id.toString()).includes(user._id.toString())) ? 'ri-heart-3-fill text-rose-500' : 'ri-heart-3-line group-hover/like:scale-110 transition-transform' %> text-lg"></i>                                             
+                                                   <span class="text-xs font-bold like-count"><%= media.likes ? media.likes.length : 0 %></span>
+                                                </button>
+                                            </div>
+                                <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-teal-500 transition">
+                                    <i class="ri-share-line"></i> Share
+                                </button>
+                                <button class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-500 transition">
+                                    <i class="ri-download-line"></i> Save
+                                </button>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <div class="aspect-square bg-gray-100 flex items-center justify-center">
+                            <i class="ri-image-line text-4xl text-gray-300"></i>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Comments Panel -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">
+                        Comments
+                        <span class="text-base font-normal text-gray-400 ml-2">(<%= locals.comments ? comments.length : 0 %>)</span>
+                    </h2>
+                </div>
+
+                <!-- Add Comment Form -->
+                <% if (locals.isLoggedIn) { %>
+                    <form method="POST" action="/comments/<%= locals.media ? media._id : '' %>" class="mb-6 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-full gradient-bg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                <%= locals.user ? user.Fullname.charAt(0) : 'U' %>
+                            </div>
+                            <div class="flex-1">
+                                <textarea name="comment" rows="2" placeholder="Write a comment..." class="textarea-field" required id="commentInput"></textarea>
+                                <div class="flex items-center justify-between mt-2">
+                                    <p class="text-xs text-gray-400">Be respectful and kind</p>
+<button type="submit" class="bg-slate-50 text-slate-800 hover:bg-black hover:text-white border border-slate-200 hover:border-black rounded-xl px-4 py-2.5 text-xs font-bold transition-all duration-300 flex items-center gap-1.5 shadow-sm active:scale-95 focus:outline-none group">
+    <i class="ri-send-plane-line text-sm text-slate-400 group-hover:text-white/80 transition-colors duration-300"></i> 
+    <span>Post</span>
+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                <% } else { %>
+                    <div class="mb-6 bg-rose-50 border border-rose-100 rounded-2xl p-4 text-center">
+                        <p class="text-sm text-gray-600">
+                            <a href="/users/login" class="text-rose-500 font-semibold hover:underline">Sign in</a> to leave a comment
+                        </p>
+                    </div>
+                <% } %>
+
+                <!-- Comments List -->
+                <div class="space-y-3" id="commentsList">
+                    <% if (locals.comments && comments.length > 0) { %>
+                        <% comments.forEach(comment => { %>
+                            <div class="comment-item bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-full gradient-bg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                        <%= comment.userId ? comment.userId.Fullname.charAt(0).toUpperCase() : 'U' %>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-baseline justify-between gap-2">
+                                            <div>
+                                                <span class="text-sm font-semibold text-gray-900">
+                                                    <%= comment.userId ? comment.userId.Fullname : 'User' %>
+                                                </span>
+                                                <% if (comment.userId && comment.userId.club) { %>
+                                                    <span class="ml-2 text-[10px] font-bold text-teal-500 bg-teal-50 px-2 py-0.5 rounded-full">
+                                                        <%= comment.userId.club %>
+                                                    </span>
+                                                <% } %>
+                                                <span class="ml-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 uppercase">
+                                                    <%= comment.userId ? comment.userId.role : 'user' %>
+                                                </span>
+                                            </div>
+                                            <span class="text-xs text-gray-400 flex-shrink-0">
+                                                <%= comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('en-IN', {month:'short',day:'numeric'}) : '' %>
+                                            </span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mt-1.5 leading-relaxed"><%= comment.text %></p>
+                                        <div class="flex items-center gap-3 mt-2">
+                                            <button class="text-xs text-gray-400 hover:text-rose-500 transition flex items-center gap-1">
+                                                <i class="ri-heart-line"></i> Like
+                                            </button>
+                                            <button class="text-xs text-gray-400 hover:text-gray-600 transition flex items-center gap-1">
+                                                <i class="ri-reply-line"></i> Reply
+                                            </button>
+                                            <% if (locals.user && (comment.userId && comment.userId._id.toString() === user._id.toString()) || (locals.user && user.role === 'admin')) { %>
+                                                <form method="POST" action="/comments/delete/<%= comment._id %>">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <button type="submit" class="text-xs text-gray-400 hover:text-rose-500 transition flex items-center gap-1">
+                                                        <i class="ri-delete-bin-line"></i> Delete
+                                                    </button>
+                                                </form>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+                                <i class="ri-chat-3-line text-2xl text-gray-300"></i>
+                            </div>
+                            <p class="text-gray-500 text-sm font-medium">No comments yet</p>
+                            <p class="text-xs text-gray-400 mt-1">Be the first to comment on this photo</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+           async function toggleLike(mediaId, buttonElement, event) {
+    if (event) event.stopPropagation();
+
+    try {
+        const response = await fetch(`/comments/media/${mediaId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            const icon = buttonElement.querySelector('i');
+            const countSpan = buttonElement.querySelector('.like-count');
+
+            countSpan.textContent = data.count;
+
+            if (data.liked) {
+                icon.className = 'ri-heart-3-fill text-rose-500 text-lg';
+                buttonElement.setAttribute('data-liked', 'true');
+            } else {
+                icon.className = 'ri-heart-3-line text-lg group-hover/like:scale-110 transition-transform';
+                buttonElement.setAttribute('data-liked', 'false');
+            }
+        } else {
+            console.error("Failed to process like status updates:", data.message);
+        }
+    } catch (err) {
+        console.error("Network interface error updating asset interactions:", err);
+    }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        window.location.reload(); 
+    }
+});
+    </script>
+</body>
+</html>

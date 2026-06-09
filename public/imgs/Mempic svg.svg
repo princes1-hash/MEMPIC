@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mempic-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+    
+    <filter id="subtle-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="140" fill="#ffffff" />
+  <rect width="480" height="480" x="16" y="16" rx="124" fill="#f8fafc" stroke="#f1f5f9" stroke-width="12" />
+
+  <g filter="url(#subtle-shadow)">
+    <path d="M128 384V176.5C128 152 146 132.5 169.5 136.5L236 148C248 150 256 160.5 256 172.5V384" fill="none" stroke="url(#mempic-gradient)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M384 384V176.5C384 152 366 132.5 342.5 136.5L276 148C264 150 256 160.5 256 172.5V384" fill="none" stroke="url(#mempic-gradient)" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M144 240L236.5 314C248 323.5 264 323.5 275.5 314L368 240" fill="none" stroke="url(#mempic-gradient)" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <circle cx="400" cy="400" r="32" fill="#2dd4bf" />
+</svg>

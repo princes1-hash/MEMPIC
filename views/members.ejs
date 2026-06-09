@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEMPIC</title>
+    <link rel="alternate icon" type="image/png" href="/imgs/Mempic svg.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased selection:bg-rose-100 selection:text-rose-600">
+   <%- include('flash') %>
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-rose-100/30 to-transparent rounded-full filter blur-3xl pointer-events-none z-0"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-gradient-to-tl from-teal-50/40 to-transparent rounded-full filter blur-3xl pointer-events-none z-0"></div>
+
+    <nav class="w-full bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" class="font-black text-slate-900 text-xl tracking-tight flex items-center gap-2">
+                MEMPIC <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+            </a>
+            <div class="flex items-center gap-6">
+                <a href="/main" class="text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors">Public Gallery</a>
+                <a href="/profile" class="text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors">Profile</a>
+                <a href="/users/logout" class="bg-slate-900 text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-all active:scale-[0.98]">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 relative z-10">
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-200/60 pb-8 mb-10">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 rounded-lg bg-rose-50 flex items-center justify-center border border-rose-100">
+                        <i class="ri-shield-user-line text-rose-500 text-sm"></i>
+                    </div>
+                    <span class="text-xs font-bold text-rose-500 uppercase tracking-widest">Only for Club Members</span>
+                </div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">
+                    <%= locals.user && user.club ? user.club : 'Club' %> <span class="font-light text-slate-400">Vault Gallery</span>
+                </h1>
+                <p class="text-slate-400 text-sm mt-1.5 font-medium">These media are visible only to club members.</p>
+            </div>
+            
+            <div class="bg-white border border-slate-200/80 rounded-2xl p-4 flex items-center gap-4 shadow-sm min-w-[220px]">
+                <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
+                    <i class="ri-git-repository-private-line text-slate-800 text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Access</p>
+                    <p class="text-sm font-black text-slate-800 mt-0.5"><%= locals.user && user.club ? user.club : 'No Club' %></p>
+                </div>
+            </div>
+        </div>
+
+        <% 
+            let filteredEvents = [];
+            if (locals.memberEvents && locals.user) {
+                filteredEvents = memberEvents.filter(event => event.club === user.club);
+            }
+        %>
+
+        <% if (filteredEvents.length > 0) { %>
+            <div class="space-y-12">
+                <% filteredEvents.forEach(event => { %>
+                    <div class="bg-white border border-slate-100 rounded-3xl p-6 sm:p-8 shadow-sm transition-all duration-300 hover:shadow-md">
+                        
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-6">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-sm">
+                                    <i class="ri-folder-image-line text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="font-extrabold text-slate-900 text-lg tracking-tight"><%= event.eventName %></h2>
+                                    <p class="text-xs text-slate-400 font-semibold mt-0.5">
+                                        <i class="ri-calendar-line"></i> <%= new Date(event.eventDate).toLocaleDateString('en-IN', {year:'numeric',month:'long',day:'numeric'}) %>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold bg-rose-50 border border-rose-100/60 text-rose-500 px-3 py-1.5 rounded-full self-start sm:self-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                <%= event.media ? event.media.length : 0 %> Vaulted Items
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                            <% if (event.media && event.media.length > 0) { %>
+                                <% event.media.forEach((media) => { %>
+                                    <div class="bg-white  border-slate-100 rounded-3xl p-3 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+                                        
+                                        <div class="relative rounded-2xl overflow-hidden bg-slate-50 aspect-[4/3] cursor-pointer group shadow-inner" onclick="openLightbox('<%= media.url %>', '<%= media.type %>')">
+                                            <% if (media.type === 'video') { %>
+                                                <video class="w-full h-full object-cover" src="<%= media.url %>"></video>
+                                                <div class="absolute inset-0 bg-slate-950/10 flex items-center justify-center group-hover:bg-slate-950/20 transition-all">
+                                                    <div class="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center shadow-md transform group-hover:scale-110 transition duration-300">
+                                                        <i class="ri-play-fill text-slate-900 text-xl pl-0.5"></i>
+                                                    </div>
+                                                </div>
+                                            <% } else { %>
+                                                <img src="<%= media.url %>" class="w-full h-full hover:scale-105 object-cover group-hover:scale-102 transition-transform duration-500 ease-out" loading="lazy">
+                                            <% } %>
+                                        </div>
+
+                                        <div class="flex items-center justify-between mt-3 px-1 text-slate-500">
+                                            <div class="flex items-center gap-3">
+                                                <button 
+                                                    onclick="toggleLike('<%= media._id %>', this, event)" 
+                                                    class="flex items-center gap-1.5 hover:text-rose-500 transition-colors text-xs group/like"
+                                                    data-liked="<%= locals.user && media.likes && media.likes.includes(user._id) ? 'true' : 'false' %>"
+                                                >
+                                                    <i class="<%= locals.user && media.likes && media.likes.includes(user._id) ? 'ri-heart-3-fill text-rose-500' : 'ri-heart-3-line group-hover/like:scale-110 transition-transform' %> text-lg"></i>
+                                                    <span class="like-count"><%= (media.likes ? media.likes.length : 0) %></span>
+                                                </button>
+                                            </div>
+
+                                            <div class="flex items-center gap-3">
+                                                <a href="/comments/<%= media._id %>" class="hover:text-slate-800 transition-colors flex items-center" title="Open Discussion Pool">
+                                                    <i class="ri-chat-3-line text-lg"></i>
+                                                </a>
+                                                <a href="<%= media.url %>" download target="_blank" class="hover:text-slate-800 transition-colors flex items-center" title="Save Source Asset">
+                                                    <i class="ri-download-cloud-2-line text-lg"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="col-span-full text-center py-16 border border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
+                                    <i class="ri-inbox-archive-line text-3xl text-slate-300 block mb-2"></i>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">No media found inside this folder</p>
+                                </div>
+                            <% } %>
+                        </div>
+
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="bg-white border border-slate-100 rounded-3xl text-center py-24 px-4 shadow-sm max-w-xl mx-auto mt-12">
+                <div class="w-20 h-20 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center mx-auto mb-6">
+                    <i class="ri-folder-shield-2-line text-3xl text-rose-400"></i>
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900 tracking-tight mb-2">No Vaulted Folders Found</h3>
+                <p class="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">Exclusive materials linked to <span class="font-bold text-slate-700 text-xs px-1.5 py-0.5 bg-slate-100 rounded-md"><%= locals.user && user.club ? user.club : 'your club' %></span> will populate here once internal photographers upload member-privileged media asset files.</p>
+            </div>
+        <% } %>
+    </main>
+
+    <div class="fixed inset-0 bg-slate-950/95 z-50 hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 opacity-0" id="lightbox" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors" onclick="closeLightbox()">
+            <i class="ri-close-large-line text-2xl"></i>
+        </button>
+        <div class="max-w-5xl w-full flex items-center justify-center" onclick="event.stopPropagation()">
+            <img id="lightboxImg" src="" class="max-h-[85vh] max-w-full rounded-2xl shadow-2xl hidden object-contain border border-white/10">
+            <video id="lightboxVideo" src="" class="max-h-[85vh] max-w-full rounded-2xl shadow-2xl hidden border border-white/10" controls></video>
+        </div>
+    </div>
+
+    <script>
+        function openLightbox(url, type) {
+            const lb = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImg');
+            const vid = document.getElementById('lightboxVideo');
+            
+            if (type === 'video') {
+                img.classList.add('hidden'); 
+                vid.classList.remove('hidden');
+                vid.src = url; 
+                vid.play();
+            } else {
+                vid.classList.add('hidden'); 
+                img.classList.remove('hidden');
+                img.src = url;
+            }
+            
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
+            setTimeout(() => {
+                lb.classList.add('opacity-100');
+            }, 10);
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('opacity-100');
+            setTimeout(() => {
+                lb.classList.remove('flex');
+                lb.classList.add('hidden');
+                document.getElementById('lightboxVideo').pause();
+            }, 300);
+        }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'Escape') closeLightbox(); 
+        });
+
+        async function toggleLike(mediaId, buttonElement, event) {
+
+    if (event) event.stopPropagation();
+
+    try {
+        const response = await fetch(`/comments/media/${mediaId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            const icon = buttonElement.querySelector('i');
+            const countSpan = buttonElement.querySelector('.like-count');
+
+            countSpan.textContent = data.count;
+
+            if (data.liked) {
+                icon.className = 'ri-heart-3-fill text-rose-500 text-lg';
+                buttonElement.setAttribute('data-liked', 'true');
+            } else {
+                icon.className = 'ri-heart-3-line text-lg group-hover/like:scale-110 transition-transform';
+                buttonElement.setAttribute('data-liked', 'false');
+            }
+        } else {
+            console.error("Failed to process like status updates:", data.message);
+        }
+    } catch (err) {
+        console.error("Network interface error updating asset interactions:", err);
+    }
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        window.location.reload(); 
+    }
+});
+    </script>
+</body>
+</html>
